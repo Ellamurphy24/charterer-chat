@@ -2,138 +2,182 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Character Chat</title>
+  <title>Bikini Bottom Chat</title>
   <style>
     body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      background: linear-gradient(to bottom, #e0f7fa, #fff);
-      margin: 0;
-      padding: 30px;
+      font-family: 'Comic Sans MS', cursive;
+      background: #e0f7fa;
       text-align: center;
-      color: #004d40;
+      padding: 30px;
     }
-
     h1 {
-      font-size: 2.8rem;
-      margin-bottom: 20px;
+      font-size: 2.5rem;
     }
-
-    #character-select {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 30px;
-    }
-
-    .character-button {
-      padding: 12px 22px;
-      font-size: 1.1rem;
+    .characters button {
+      margin: 10px;
+      padding: 15px 25px;
+      font-size: 1rem;
+      background-color: #4dd0e1;
+      color: white;
       border: none;
       border-radius: 12px;
-      background-color: #4db6ac;
-      color: #fff;
       cursor: pointer;
-      transition: transform 0.2s ease, background-color 0.3s ease;
     }
-
-    .character-button:hover {
-      background-color: #00897b;
-      transform: scale(1.05);
-    }
-
-    #chat-box {
-      width: 90%;
+    .chat-box {
+      margin-top: 30px;
       max-width: 600px;
-      margin: 0 auto;
-      background: #e0f2f1;
-      padding: 20px;
+      margin-left: auto;
+      margin-right: auto;
+      background: white;
       border-radius: 12px;
-      min-height: 220px;
-      text-align: left;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
-    .message {
-      margin: 10px 0;
-      padding: 8px 12px;
-      border-radius: 10px;
+    .bubble {
+      background: #b2ebf2;
+      padding: 10px 15px;
+      border-radius: 15px;
+      margin: 10px;
       display: inline-block;
+      max-width: 80%;
+      text-align: left;
     }
-
-    .you {
-      background-color: #a7ffeb;
-      align-self: flex-end;
+    .user {
+      background: #c5e1a5;
+      text-align: right;
+      float: right;
     }
-
-    .character {
-      background-color: #ffe082;
-      align-self: flex-start;
+    input[type="text"] {
+      width: 60%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    button.send-btn {
+      padding: 10px 20px;
+      margin-left: 10px;
+      border-radius: 10px;
+      background-color: #4dd0e1;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <h1>💬 Bikini Bottom Chat</h1>
-  <div id="character-select">
-    <button class="character-button" onclick="selectCharacter('spongebob')">🧽 SpongeBob</button>
-    <button class="character-button" onclick="selectCharacter('patrick')">⭐ Patrick</button>
-    <button class="character-button" onclick="selectCharacter('squidward')">🎷 Squidward</button>
-    <button class="character-button" onclick="selectCharacter('gary')">🐌 Gary</button>
-    <button class="character-button" onclick="selectCharacter('sandy')">🐿️ Sandy</button>
-    <button class="character-button" onclick="selectCharacter('mrkrabs')">💰 Mr. Krabs</button>
-    <button class="character-button" onclick="selectCharacter('plankton')">🔬 Plankton</button>
-    <button class="character-button" onclick="selectCharacter('karin')">💻 Karen</button>
-    <button class="character-button" onclick="selectCharacter('larry')">🏋️ Larry</button>
-    <button class="character-button" onclick="selectCharacter('pearl')">🐳 Pearl</button>
-    <button class="character-button" onclick="selectCharacter('flyingdutchman')">👻 Flying Dutchman</button>
+  <div class="characters">
+    <button onclick="startChat('SpongeBob')">SpongeBob</button>
+    <button onclick="startChat('Patrick')">Patrick</button>
+    <button onclick="startChat('Squidward')">Squidward</button>
+    <button onclick="startChat('Mr. Krabs')">Mr. Krabs</button>
+    <button onclick="startChat('Sandy')">Sandy</button>
+    <button onclick="startChat('Plankton')">Plankton</button>
+    <button onclick="startChat('Gary')">Gary</button>
+    <button onclick="startChat('Pearl')">Pearl</button>
+    <button onclick="startChat('Larry')">Larry the Lobster</button>
+    <button onclick="startChat('Mrs. Puff')">Mrs. Puff</button>
   </div>
 
-  <div id="chat-box">
-    <p><em>Click a character above to start chatting!</em></p>
+  <div id="chat" class="chat-box" style="display:none;">
+    <div id="chatLog"></div>
+    <input type="text" id="userInput" placeholder="Type here...">
+    <button class="send-btn" onclick="sendMessage()">Send</button>
   </div>
 
   <script>
-    const chatBox = document.getElementById('chat-box');
-
-    const quotes = {
-      spongebob: [
-        "I'm ready! I'm ready!",
+    let currentChar = "";
+    const phrases = {
+      SpongeBob: [
+        "I'm Ready, I'm Ready, I'm Ready!",
+        "F is for friends who do stuff together!",
+        "The Krusty Krab Pizza is the pizza for you and me!",
         "I'm a Goofy Goober, yeah!",
-        "The best time to wear a striped sweater is all the time."
+        "You don't need a license to drive a sandwich."
       ],
-      patrick: [
+      Patrick: [
         "Is mayonnaise an instrument?",
         "The inner machinations of my mind are an enigma.",
-        "I can't see my forehead."
+        "I can't see my forehead!",
+        "I wumbo, you wumbo...",
+        "Once there was an ugly barnacle..."
       ],
-      squidward: [
-        "Just another day of greatness...",
-        "Too bad that didn't kill me.",
-        "Welcome to the Krusty Krab."
+      Squidward: [
+        "I might as well sleep for 100 years or so.",
+        "Too bad SpongeBob, you're five minutes late.",
+        "Welcome to the Krusty Krab. May I take your order?",
+        "Why must every eleven minutes of my life be filled with misery?",
+        "It's called a clarinet."
       ],
-      gary: ["Meow.", "Meow... meow?", "Meeeeow."],
-      sandy: ["Y'all better hold on to your britches!", "I'm fixin' to karate chop ya!", "I'm a Texas squirrel in a sea world!"],
-      mrkrabs: ["Money, money, money!", "I like me customers like I like me money: in stacks.", "Do you smell it? That smell. A kind of smelly smell. The smelly smell that smells... smelly."],
-      plankton: ["I went to college!", "I'll steal that secret formula yet!", "You’ll rue the day you crossed me, Krabs!"],
-      karin: ["Initializing sarcasm module...", "Plankton, why are you like this?", "I’m your wife, not your motherboard."],
-      larry: ["Sun's out, buns out!", "Do you even lift, bro?", "Gotta stay pumped!"],
-      pearl: ["Daaaaad! You're so embarrassing!", "I need new shoes... again!", "OMG, this is like, so lame."],
-      flyingdutchman: ["You dare summon the Flying Dutchman?", "Arrr! I'm here for your souls!", "A ghostly giggle haunts the night!"]
+      "Mr. Krabs": [
+        "Money, money, money!",
+        "I like me money like I like me lobster: fresh!",
+        "That'll be a whole dollar, please!",
+        "Argh, SpongeBob! Get back to work!",
+        "I'm feeling generous today… 50% off your paycheck!"
+      ],
+      Sandy: [
+        "Howdy y'all!",
+        "Don’t you dare take the name of Texas in vain!",
+        "I’m tougher than a pine knot!",
+        "This is gonna be more fun than a sack full o' squirrels!",
+        "Science is my middle name!"
+      ],
+      Plankton: [
+        "I went to college!",
+        "The Krabby Patty formula will be mine!",
+        "Karen, activate the plan!",
+        "Why does nobody love me?",
+        "I shall rule the world!"
+      ],
+      Gary: [
+        "Meow.", "Meow~", "Meeeeow.", "Mrow?", "Meeoowww."
+      ],
+      Pearl: [
+        "Daaaad, you're embarrassing me!",
+        "OMG, SpongeBob!",
+        "Let's go to the mall!",
+        "That is so last season!",
+        "Whale coming through!"
+      ],
+      Larry: [
+        "Sun's out, buns out!",
+        "Feel the burn!",
+        "Time to pump some iron!",
+        "I’m a lifeguard, it’s what I do.",
+        "No pain, no gain!"
+      ],
+      "Mrs. Puff": [
+        "Oh SpongeBob, why?!",
+        "Extra credit? Oh, please!",
+        "Not again!",
+        "Boating school is serious business!",
+        "Just... drive straight, SpongeBob."
+      ]
     };
 
-    function selectCharacter(name) {
-      const messages = quotes[name];
-      const random = messages[Math.floor(Math.random() * messages.length)];
-      const userMsg = `<div class="message you"><strong>You:</strong> Hi ${capitalize(name)}!</div>`;
-      const characterMsg = `<div class="message character"><strong>${capitalize(name)}:</strong> ${random}</div>`;
-
-      chatBox.innerHTML += userMsg + characterMsg;
-      chatBox.scrollTop = chatBox.scrollHeight;
+    function startChat(character) {
+      currentChar = character;
+      document.getElementById("chat").style.display = "block";
+      document.getElementById("chatLog").innerHTML = `<div class='bubble'>Hey, I'm ${character}! Do you want to chat?</div>`;
     }
 
-    function capitalize(str) {
-      return str.charAt(0).toUpperCase() + str.slice(1);
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const message = input.value.trim();
+      if (!message) return;
+      const log = document.getElementById("chatLog");
+      log.innerHTML += `<div class='bubble user'>${message}</div>`;
+
+      if (message.toLowerCase() === "hi") {
+        log.innerHTML += `<div class='bubble'>Hey, I'm ${currentChar}! Do you want to chat?</div>`;
+      } else {
+        const replies = phrases[currentChar];
+        const response = replies[Math.floor(Math.random() * replies.length)];
+        log.innerHTML += `<div class='bubble'>${response}</div>`;
+      }
+      input.value = "";
+      input.focus();
     }
   </script>
 </body>
