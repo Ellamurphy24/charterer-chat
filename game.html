@@ -132,8 +132,12 @@
     const ingredients = ["bun", "patty", "cheese", "lettuce"];
     let order = [], stack = [];
 
+    function generateOrder() {
+      return [...ingredients].sort(() => Math.random() - 0.5).slice(0, 3);
+    }
+
     function startPatty() {
-      order = [...ingredients].sort(() => Math.random() - 0.5).slice(0, 3);
+      order = generateOrder();
       stack = [];
       document.getElementById("order").textContent = order.join(" → ");
       document.getElementById("feedback").textContent = "";
@@ -156,7 +160,12 @@
 
     function submitPatty() {
       const match = JSON.stringify(order) === JSON.stringify(stack);
-      document.getElementById("feedback").textContent = match ? "✅ Perfect!" : "❌ Try Again!";
+      document.getElementById("feedback").textContent = match ? "✅ Perfect! New order loading..." : "❌ Try Again!";
+      if (match) {
+        setTimeout(() => {
+          startPatty();
+        }, 1000);
+      }
     }
 
     // Sponge Sprint
