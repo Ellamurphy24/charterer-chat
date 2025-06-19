@@ -9,6 +9,7 @@
       background: #e0f7fa;
       text-align: center;
       padding: 30px;
+      transition: background 0.5s ease;
     }
     h1 {
       font-size: 2.5rem;
@@ -34,7 +35,6 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     .bubble {
-      background: #b2ebf2;
       padding: 10px 15px;
       border-radius: 15px;
       margin: 10px;
@@ -85,8 +85,14 @@
     <button class="send-btn" onclick="sendMessage()">Send</button>
   </div>
 
+  <audio id="sound"></audio>
+
   <script>
     let currentChar = "";
+    const chat = document.getElementById("chat");
+    const log = document.getElementById("chatLog");
+    const sound = document.getElementById("sound");
+
     const phrases = {
       SpongeBob: [
         "I'm Ready, I'm Ready, I'm Ready!",
@@ -130,9 +136,7 @@
         "Why does nobody love me?",
         "I shall rule the world!"
       ],
-      Gary: [
-        "Meow.", "Meow~", "Meeeeow.", "Mrow?", "Meeoowww."
-      ],
+      Gary: ["Meow.", "Meow~", "Meeeeow.", "Mrow?", "Meeoowww."],
       Pearl: [
         "Daaaad, you're embarrassing me!",
         "OMG, SpongeBob!",
@@ -156,25 +160,63 @@
       ]
     };
 
+    const colors = {
+      SpongeBob: "#fff176",
+      Patrick: "#f8bbd0",
+      Squidward: "#b3e5fc",
+      "Mr. Krabs": "#e57373",
+      Sandy: "#ffe0b2",
+      Plankton: "#aed581",
+      Gary: "#d1c4e9",
+      Pearl: "#e1bee7",
+      Larry: "#ef9a9a",
+      "Mrs. Puff": "#fff9c4"
+    };
+
+    const backgrounds = {
+      SpongeBob: "#e0f7fa",
+      Patrick: "#fce4ec",
+      Squidward: "#e1f5fe",
+      "Mr. Krabs": "#ffebee",
+      Sandy: "#fbe9e7",
+      Plankton: "#f1f8e9",
+      Gary: "#f3e5f5",
+      Pearl: "#fce4ec",
+      Larry: "#ffebee",
+      "Mrs. Puff": "#fffde7"
+    };
+
+    const sounds = {
+      SpongeBob: "https://www.myinstants.com/media/sounds/spongebob-laugh.mp3",
+      Patrick: "https://www.myinstants.com/media/sounds/patrick-laugh.mp3",
+      "Mr. Krabs": "https://www.myinstants.com/media/sounds/money_2.mp3",
+      Gary: "https://www.myinstants.com/media/sounds/spongebob-gary-meow.mp3"
+    };
+
     function startChat(character) {
       currentChar = character;
-      document.getElementById("chat").style.display = "block";
-      document.getElementById("chatLog").innerHTML = `<div class='bubble'>Hey, I'm ${character}! Do you want to chat?</div>`;
+      document.body.style.background = backgrounds[character] || "#e0f7fa";
+      chat.style.display = "block";
+      log.innerHTML = `<div class='bubble' style='background:${colors[character]};'>Hey, I'm ${character}! Do you want to chat?</div>`;
     }
 
     function sendMessage() {
       const input = document.getElementById("userInput");
       const message = input.value.trim();
       if (!message) return;
-      const log = document.getElementById("chatLog");
       log.innerHTML += `<div class='bubble user'>${message}</div>`;
 
       if (message.toLowerCase() === "hi") {
-        log.innerHTML += `<div class='bubble'>Hey, I'm ${currentChar}! Do you want to chat?</div>`;
+        log.innerHTML += `<div class='bubble' style='background:${colors[currentChar]};'>Hey, I'm ${currentChar}! Do you want to chat?</div>`;
       } else {
         const replies = phrases[currentChar];
         const response = replies[Math.floor(Math.random() * replies.length)];
-        log.innerHTML += `<div class='bubble'>${response}</div>`;
+        log.innerHTML += `<div class='bubble' style='background:${colors[currentChar]};'>${response}</div>`;
+
+        if (sounds[currentChar]) {
+          sound.src = sounds[currentChar];
+          sound.play();
+        }
       }
       input.value = "";
       input.focus();
