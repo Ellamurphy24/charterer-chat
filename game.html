@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bikini Bottom Arcade</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive;
+      background: linear-gradient(to bottom, #b2ebf2, #e0f7fa);
+      text-align: center;
+      color: #004d40;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2.5rem;
+    }
+    .menu button, .ingredient-btn, .restart-btn {
+      margin: 10px;
+      padding: 15px 25px;
+      font-size: 1.1rem;
+      background-color: #4dd0e1;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+    }
+    .menu button:hover, .ingredient-btn:hover, .restart-btn:hover {
+      background-color: #00838f;
+    }
+    .game-box {
+      display: none;
+      margin-top: 20px;
+    }
+    canvas {
+      border-radius: 10px;
+      background-color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 Bikini Bottom Arcade</h1>
+  <div class="menu">
+    <button onclick="showGame('jelly')">🪼 Jellyfish Catch</button>
+    <button onclick="showGame('patty')">🍔 Krabby Patty Rush</button>
+    <button onclick="showGame('sprint')">🏃 Sponge Sprint</button>
+  </div>
+
+  <!-- Jellyfish Catch -->
+  <div id="jelly" class="game-box">
+    <p id="jellyScore">Score: 0</p>
+    <canvas id="jellyCanvas" width="600" height="300"></canvas>
+  </div>
+
+  <!-- Krabby Patty Rush -->
+  <div id="patty" class="game-box">
+    <p>Order: <span id="order"></span></p>
+    <div id="stack-area"></div>
+    <p>Your Stack:</p>
+    <ul id="stackList"></ul>
+    <button onclick="submitPatty()">Submit</button>
+    <p id="feedback"></p>
+  </div>
+
+  <!-- Sponge Sprint -->
+  <div id="sprint" class="game-box">
+    <p id="sprintScore">Score: 0</p>
+    <canvas id="sprintCanvas" width="600" height="200"></canvas>
+    <button class="restart-btn" onclick="startSprint()" style="display:none" id="restartBtn">Restart</button>
+    <p id="gameOverText"></p>
+  </div>
+
+  <script>
+    function showGame(id) {
+      document.querySelectorAll('.game-box').forEach(div => div.style.display = 'none');
+      document.getElementById('restartBtn').style.display = 'none';
+      document.getElementById('gameOverText').textContent = '';
+      document.getElementById(id).style.display = 'block';
+      if (id === 'jelly') startJelly();
+      if (id === 'patty') startPatty();
+      if (id === 'sprint') startSprint();
+    }
+
+    // Jellyfish Catch
+    const jellyCanvas = document.getElementById("jellyCanvas");
+    const jCtx = jellyCanvas.getContext("2d");
+    let jellyfish = [], jellyScore = 0, jellyInterval;
+
+    function spawnJelly() {
+      jellyfish.push({ x: Math.random() * 570, y: 300, r: 15 });
+    }
+
+    function drawJellyfish() {
+      jCtx.clearRect(0, 0, 600, 300);
+      jellyfish.forEach(j => {
+        j.y -= 2;
+        jCtx.beginPath();
+        jCtx.arc(j.x, j.y, j.r, 0, Math.PI * 2);
+        jCtx.fillStyle = '#ff80ab';
+        jCtx.fill();
+      });
+      jellyfish = jellyfish.filter(j => j.y > -20);
+    }
+
+    jellyCanvas.addEventListener('click', e => {
+      const rect = jellyCanvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      jellyfish = jellyfish.filter(j => {
+        const d = Math.hypot(clickX - j.x, clickY - j.y);
+        if (d < j.r) {
+          jellyScore++;
+          document.getElementById("jellyScore").textContent = "Score: " + jellyScore;
+          return false;
+        }
+        return true;
+      });
+    });
+
+    function startJelly() {
+      clearInterval(jellyInterval);
+      jellyScore = 0;
+      jellyfish = [];
+      document.getElementById("jellyScore").textContent = "Score: 0";
+      jellyInterval = setInterval(() => {
+        spawnJelly();
+        drawJellyfish();
+      }, 100);
+    }
+
+    // Krabby Patty Rush
+    const ingredients = ["bun", "patty", "cheese", "lettuce"];
+    let order = [], stack = [];
+
+    function startPatty() {
+      order = [...ingredients].sort(() => Math.random() - 0.5).slice(0, 3);
+      stack = [];
+      document.getElementById("order").textContent = order.join(" → ");
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("stackList").innerHTML = "";
+      const area = document.getElementById("stack-area");
+      area.innerHTML = "";
+      ingredients.forEach(i => {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.className = "ingredient-btn";
+        btn.onclick = () => {
+          stack.push(i);
+          const li = document.createElement("li");
+          li.textContent = i;
+          document.getElementById("stackList").appendChild(li);
+        };
+        area.appendChild(btn);
+      });
+    }
+
+    function submitPatty() {
+      const match = JSON.stringify(order) === JSON.stringify(stack);
+      document.getElementById("feedback").textContent = match ? "✅ Perfect!" : "❌ Try Again!";
+    }
+
+    // Sponge Sprint
+    const sprintCanvas = document.getElementById("sprintCanvas");
+    const sCtx = sprintCanvas.getContext("2d");
+    let sX = 50, sY = 160, sVelY = 0, sJumping = false, sAlive = true;
+    let sScore = 0, sprintInterval, objs = [];
+
+    function startSprint() {
+      clearInterval(sprintInterval);
+      sX = 50; sY = 160; sVelY = 0; sJumping = false; sAlive = true;
+      sScore = 0; objs = [];
+      document.getElementById("sprintScore").textContent = "Score: 0";
+      document.getElementById("restartBtn").style.display = "none";
+      document.getElementById("gameOverText").textContent = "";
+
+      sprintInterval = setInterval(() => {
+        if (!sAlive) return;
+
+        sCtx.clearRect(0, 0, 600, 200);
+
+        sY += sVelY;
+        if (sJumping) sVelY += 1;
+        if (sY >= 160) {
+          sY = 160;
+          sVelY = 0;
+          sJumping = false;
+        }
+
+        sCtx.fillStyle = "#fdd835";
+        sCtx.fillRect(sX, sY, 30, 30);
+
+        if (Math.random() < 0.05) objs.push({ x: 600, type: Math.random() < 0.5 ? "ob" : "power" });
+        objs.forEach(o => {
+          o.x -= 5;
+          if (o.type === "ob") {
+            sCtx.fillStyle = "red";
+            sCtx.fillRect(o.x, 170, 20, 20);
+            if (sX + 30 > o.x && sX < o.x + 20 && sY + 30 > 170) {
+              sAlive = false;
+              clearInterval(sprintInterval);
+              document.getElementById("gameOverText").textContent = "💀 You hit an obstacle!";
+              document.getElementById("restartBtn").style.display = "inline-block";
+            }
+          } else {
+            sCtx.fillStyle = "green";
+            sCtx.beginPath();
+            sCtx.arc(o.x, 180, 10, 0, Math.PI * 2);
+            sCtx.fill();
+            if (Math.abs(sX - o.x) < 20 && Math.abs(sY - 180) < 30) {
+              sScore++;
+              o.x = -100;
+            }
+          }
+        });
+
+        objs = objs.filter(o => o.x > -20);
+        document.getElementById("sprintScore").textContent = "Score: " + sScore;
+      }, 30);
+    }
+
+    document.addEventListener("keydown", e => {
+      if ((e.key === " " || e.key === "ArrowUp") && !sJumping && sAlive) {
+        sVelY = -15;
+        sJumping = true;
+      }
+      if (e.key === "ArrowLeft" && sAlive) sX = Math.max(0, sX - 10);
+      if (e.key === "ArrowRight" && sAlive) sX = Math.min(570, sX + 10);
+    });
+  </script>
+</body>
+</html>
