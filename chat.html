@@ -29,12 +29,13 @@
       cursor: pointer;
       background-color: #4dd0e1;
       color: white;
+      transition: background 0.3s;
     }
+    .character-btn:hover { background-color: #0097a7; }
     .chat-box {
       margin-top: 30px;
       max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
+      margin: auto;
       background: white;
       border-radius: 12px;
       padding: 20px;
@@ -53,30 +54,14 @@
       0% { opacity: 0; transform: translateY(10px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-    .user {
-      background: #c5e1a5;
-      text-align: right;
-      float: right;
-    }
+    .user { background: #c5e1a5; float:right; text-align:right; clear:both; }
     input[type="text"] {
-      width: 60%;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
+      width: 60%; padding: 10px; border-radius: 10px; border:1px solid #ccc;
     }
     button.send-btn, button.clear-btn, button.trivia-btn {
-      padding: 10px 15px;
-      margin: 5px;
-      border-radius: 10px;
-      background-color: #4dd0e1;
-      color: white;
-      border: none;
-      cursor: pointer;
+      padding:10px 15px; margin:5px; border-radius:10px; background:#4dd0e1; color:white; border:none; cursor:pointer;
     }
-    select {
-      padding: 5px;
-      margin-left: 10px;
-    }
+    select { padding:5px; margin-left:10px; }
   </style>
 </head>
 <body>
@@ -89,8 +74,7 @@
     <option value="goofy">Goofy</option>
   </select>
 
-  <div class="characters" id="characterList"></div>
-    <div class="characters">
+  <div class="characters">
     <button class="character-btn" onclick="startChat('SpongeBob')">🧽 SpongeBob</button>
     <button class="character-btn" onclick="startChat('Patrick')">🌟 Patrick</button>
     <button class="character-btn" onclick="startChat('Squidward')">🎷 Squidward</button>
@@ -112,142 +96,113 @@
   </div>
 
   <script>
-    const characterList = document.getElementById("characterList");
-    const chat = document.getElementById("chat");
-    const log = document.getElementById("chatLog");
-    const mood = document.getElementById("mood");
-    let currentChar = "";
-
-      const emojiIcons = {
-      SpongeBob: "🧽",
-      Patrick: "🌟",
-      Squidward: "🎷",
-      MrKrabs: "💰",
-      Sandy: "🐿️",
-      Plankton: "🦠",
-      Gary: "🐌",
-      Pearl: "🐳",
-      Larry: "🦞",
-      MrsPuff: "🎈"
-    };
-    characters.forEach(char => {
-      const btn = document.createElement("button");
-      btn.className = "character-btn";
-      btn.textContent = char;
-      btn.onclick = () => startChat(char);
-      characterList.appendChild(btn);
-    });
+    const chat = document.getElementById('chat');
+    const log = document.getElementById('chatLog');
+    const mood = document.getElementById('mood');
+    let currentChar = '';
 
     const phrases = {
-      "SpongeBob": {
-        default: ["I’m ready! I’m ready!", "Best day ever!", "Time to flip Krabby Patties!", "You wanna go jellyfishing?", "Let’s sing the FUN song!"],
-        happy: ["Nothing can ruin this day!", "Let’s go to Glove World!", "F is for friends who do stuff together!", "Who needs a license when you have enthusiasm?", "Patrick and I made a bubble buddy!"],
-        sad: ["Gary... come home.", "I ruined everything again.", "Even my spatula hates me.", "I miss working with Squidward...", "The grill won’t even light today."],
-        goofy: ["I’m a Goofy Goober, YEAH!", "I accidentally cleaned the ocean.", "DoodleBob?! NOOOYAHOYMINOY.", "Wanna see my imagination box?", "I named my spatula Spatty."]
+      SpongeBob: {
+        default: ["I'm Ready!", "F is for friends!", "The best time to wear a striped sweater is all the time!", "Order up!", "Wanna go jellyfishing?"],
+        happy: ["Yippee! Jellyfishing time!", "I love my job!", "Woohoo! Best day ever!", "Time for another Krabby Patty!", "You're my best friend!"],
+        sad: ["I guess I'm not ready...", "I miss Gary...", "Not even jellyfishing cheers me up today.", "Maybe I'm just a sponge...", "I'm just a kid."],
+        goofy: ["I'm a Goofy Goober, yeah!", "Wanna see my jellyfishing net trick?", "Did someone say... bubbles?", "Banana peel slip!", "Blblblblbl!"]
       },
-      "Patrick": {
-        default: ["Is mayonnaise an instrument?", "Wanna do nothing together?", "I had a sandwich once.", "I’m smart. S-M-R-T!", "The inner machinations of my mind are an enigma... *spills milk*"],
-        happy: ["Today’s nap was extra special!", "SpongeBob, I found a rock that’s shaped like a rock!", "Let’s eat ice cream until we explode!", "Yay for jellyfish stings!", "Tide’s in, I’m happy!"],
-        sad: ["I dropped my last cookie...", "I think my rock is mad at me.", "I can’t find my pants.", "Why isn’t SpongeBob answering?", "Everything’s upside down today..."],
-        goofy: ["I WUMBO, you WUMBO, he, she, me... WUMBO!", "I invented a new way to sleep!", "Let’s jellyfish in reverse!", "Do snails eat socks?", "I tried to eat a shoe."]
+      Patrick: {
+        default: ["Is mayonnaise an instrument?", "The inner machinations of my mind are an enigma.", "I can't see my forehead.", "Once, I dreamt I was a jellyfish!", "Let's take a nap... forever."],
+        happy: ["Let's go jellyfishing!", "Best day ever!", "Want to watch TV and eat ice cream?", "Nap time is every time!", "Life is pink!"],
+        sad: ["No more ice cream...", "Even rocks are smarter than me.", "I lost my rock again.", "I stepped on my own toe.", "Sadness is... not knowing what day it is."],
+        goofy: ["Wumbo. It's first grade, SpongeBob!", "Krabby Patties? More like... Patty Krabbies!", "Let’s ride seahorses backwards!", "Did I just think something?", "Wiggly-jiggly!"]
       },
-      "Squidward": {
-        default: ["Just another miserable day.", "Please go away.", "I have clarinet practice.", "SpongeBob, no.", "Why does no one appreciate art?"],
-        happy: ["They finally left me alone.", "I sold a painting today.", "The Krusty Krab was quiet.", "Ah... peace and quiet.", "The ocean didn’t annoy me today."],
-        sad: ["Nobody clapped after my solo.", "The clarinet sounds like a dying whale.", "They made fun of my art again.", "My souffle collapsed...", "I stepped on a sea urchin."],
-        goofy: ["I did interpretive dance... in public.", "I joined SpongeBob’s jellyfish band.", "I painted using a mop!", "I played clarinet with my nose.", "Call me ‘DJ Tentaclez.’"]
+      Squidward: {
+        default: ["Go away.", "I'm surrounded by idiots.", "Clarinet solo coming up...", "Why must I suffer?", "At least I'm not SpongeBob."],
+        happy: ["Finally... peace and quiet.", "A full day without SpongeBob!", "They liked my clarinet!", "No customers today.", "Ah, art and solitude."],
+        sad: ["I didn't get into the art show... again.", "Another failed audition.", "Why do I even try?", "I just wanted silence.", "They threw tomatoes."],
+        goofy: ["Tentacle break dance!", "SpongeBob rubbed off on me.", "I'm Squidgoober!", "Clarinet kazoo time!", "Art attack!"]
       },
-      "Mr. Krabs": {
-        default: ["That’ll be $5.99.", "No refunds!", "Get back to work, boy!", "Time is money!", "I smell profit!"],
-        happy: ["We broke a sales record!", "I found a nickel on the floor!", "Me treasure chest is full!", "SpongeBob made 500 patties today!", "Even Plankton didn’t try anything!"],
-        sad: ["Me wallet feels light...", "Lost a dime in the register.", "No customers?!", "That pesky Plankton stole me spoon!", "I had to give Squidward a break..."],
-        goofy: ["I charged customers for breathing!", "I built a Krabby Patty throne!", "Let’s sell sand for $10 a bag!", "Who needs sleep when you have profit?", "Arrr, me heart skips for gold!"]
+      MrKrabs: {
+        default: ["Money, money, money!", "I'm making it worse by not giving you a raise!", "The Krusty Krab is in me blood!", "That's me first dollar!", "Do you smell that? It's the smell of money!"],
+        happy: ["Aye! Business is boomin'!", "A full house and a full register!", "I love the sound of coins clinkin'!", "Just made another buck!", "Krusty Krab for life!"],
+        sad: ["Me profits are sinking...", "Even the Chum Bucket’s outsellin’ us.", "No customers?!", "Lost a penny today...", "Maybe I should’ve paid SpongeBob..."],
+        goofy: ["No refunds! Except maybe for Squidward.", "The secret formula is… ketchup.", "Money jokes are *priceless*!", "Buy one, get none!", "Arrrr you kidding me?"]
       },
-      "Sandy": {
-        default: ["Howdy, partner!", "Y’all seen my acorns?", "Just finished a new invention!", "Science AND karate? Perfect combo.", "Texas forever!"],
-        happy: ["Invented a jetpack using kelp!", "Caught a jellyfish mid-karate kick!", "Sun’s out, science time!", "Nothing beats fresh air... kinda.", "Wrote a whole paper on sponges today!"],
-        sad: ["I miss Texas somethin’ fierce...", "The air pump’s actin’ up.", "No one appreciates my squirrel smarts.", "My lasso broke.", "It’s too soggy down here today."],
-        goofy: ["Tried underwater rodeo... again.", "Accidentally turned SpongeBob invisible.", "Karate-chopped a vending machine.", "Made robot boots that won’t stop dancin’!", "I taught a jellyfish how to moonwalk."]
+      Sandy: {
+        default: ["Howdy y’all!", "I’m fixin’ to karate chop boredom!", "Science rules!", "Let’s lasso some jellyfish!", "Underwater ain't so bad."],
+        happy: ["Just invented a jetpack!", "This suit is feelin’ light today!", "Come on, SpongeBob!", "Nothing beats karate!", "I’m on fire! (Not literally.)"],
+        sad: ["I miss Texas.", "I ran out of acorns.", "Even science fails sometimes...", "Home sickness is real.", "I broke my lasso..."],
+        goofy: ["Nuts and bolts!", "Let's rope the moon!", "Yeehaww upside down!", "Squirrel mode engaged!", "I karate chopped a cloud!"]
       },
-      "Plankton": {
-        default: ["I WILL steal that formula!", "One day, Krabs... one day.", "Karen! Boot up Plan Z!", "I’m 1% evil, 99% hot gas.", "The Chum Bucket is open... barely."],
-        happy: ["I almost got the recipe today!", "Karen gave me a compliment!", "We had ONE customer!", "SpongeBob tripped. Good day.", "I hacked the Krusty Krab speakers!"],
-        sad: ["Another failed plan...", "Karen’s giving me the cold circuit.", "They laughed at my chum tacos.", "My shrink ray shrunk me again.", "I got stepped on twice."],
-        goofy: ["I cloned myself into a boy band!", "I opened a Chum Spa!", "The formula was in my pocket...", "I zapped my own antenna.", "I danced in jelly!"]
+      Plankton: {
+        default: ["I will steal the Krabby Patty formula!", "Curse you, Krabs!", "Plan Z is almost ready...", "Karen, start the laser!", "Evil never sleeps!"],
+        happy: ["Victory is close!", "This time, I won't fail!", "I hacked the fryer!", "Time to rule the ocean!", "Karen believes in me!"],
+        sad: ["Foiled again...", "Karen left me on read.", "Back to the drawing board.", "No customers today.", "Evil is lonely..."],
+        goofy: ["Formula smoothie anyone?", "Laser sharks go BRRR!", "Tried to clone a pickle.", "Dance, micro-minions!", "Shrink ray misfire!"]
       },
-      "Gary": {
-        default: ["Meow.", "Meoooow.", "Mrrrrow.", "Meeew.", "Mrow mrow."],
-        happy: ["Meow meow!"],
-        sad: ["Meooow..."],
-        goofy: ["MEEEOWW!!"]
+      Gary: {
+        default: ["Meow.", "Meow meow.", "...Meow?", "Meeoooww!", "Mrrrow?"],
+        happy: ["Meow!", "Purrrr", "Meeowww!", "Meow meow meow!", "*purrs louder*"],
+        sad: ["meooow...", "sniff... meow.", "...", "Meeow...", "low meow"],
+        goofy: ["Meeeooowwww", "Mrrrrreeeww!", "Meeep!", "Gar-gar!", "Meowmageddon!"]
       },
-      "Pearl": {
-        default: ["Ugh, dad, stop embarrassing me!", "No way I’m working at the Krusty Krab.", "I have a mall date today.", "Where’s my shell polish?", "I’m too glam for chum."],
-        happy: ["Sale at the mall!", "New shoes dropped!", "I got 100 shellfie likes!", "Dance party tonight!", "Someone called me stylish!"],
-        sad: ["My tail’s frizzy.", "They said I was loud.", "Dad ruined my date.", "I got grounded from shopping.", "No one texted me back."],
-        goofy: ["I wore clownfish lipstick!", "I danced on a jellyfish floatie!", "My purse squeaked all day.", "Oops, I crushed the couch!", "I texted Krabs by mistake!"]
+      Pearl: {
+        default: ["Daaaaddd!", "I need a new phone!", "Prom is EVERYTHING!", "You're embarrassing me!", "I'm not a little girl anymore!"],
+        happy: ["That sale was AMAZING!", "OMG, I got the dress!", "So many likes!", "This party slaps!", "Yaaas, queen!"],
+        sad: ["Nothing fits right...", "My friends ignored me.", "I tripped on stage...", "Dad won't listen...", "No one gets me!"],
+        goofy: ["Whale dance!", "Bubble beard selfies!", "Krabby Patty face mask!", "Moo! Wait, I’m a whale...", "OMG LOL!"]
       },
-      "Larry the Lobster": {
-        default: ["Gym’s open 24/7, bro!", "Muscles AND morals!", "Claw day is every day.", "Protein rules!", "Let’s hit Goo Lagoon."],
-        happy: ["I benched a boat today!", "Crushed my workout!", "Sun’s perfect for flexing.", "Crowd cheered when I jogged!", "New record: 100 burpees!"],
-        sad: ["I forgot leg day...", "My claw cramped.", "The lifeguard whistle broke.", "Missed beach volleyball.", "Squidward beat me in chess...?"],
-        goofy: ["I flexed a jellyfish!", "Protein kelp explosion!", "Sunglasses fell in a blender!", "Crab walked across town!", "Did a backflip into seaweed."]
+      Larry: {
+        default: ["Lift with your claws!", "Time to flex!", "Sun’s out, claws out!", "Cardio is life!", "Protein shake time!"],
+        happy: ["Beach party!", "Surf's up!", "Bro, let’s lift!", "I maxed out again!", "Let's hit the waves!"],
+        sad: ["Forgot leg day...", "No one noticed my biceps.", "Too sore to flex...", "Missed the beach bash...", "Gym’s closed!"],
+        goofy: ["Bicep boogie!", "Treadmill surfing!", "Dumbbell juggling!", "Lift and twirl!", "Protein cannonball!"]
       },
-      "Mrs. Puff": {
-        default: ["SpongeBob, not again!", "I can’t take another crash!", "This is a driving school, not a bumper car arena.", "Why me?", "Deep breaths..."],
-        happy: ["SpongeBob skipped class!", "No one hit the cones!", "I passed two students today!", "Insurance paid out!", "Quiet. Peaceful. Blissful."],
-        sad: ["He hit reverse again.", "The boat exploded.", "I’m going to jail... again.", "My puffer fish therapy isn’t working.", "There are no brakes on this bus."],
-        goofy: ["We taught jellyfish to drive!", "Cone slalom champion!", "Parallel parking with your eyes closed!", "Puffer-popped mid-lesson!", "Boat drift mode: activated!"]
+      MrsPuff: {
+        default: ["Oh SpongeBob, why?", "I'm going to jail!", "Extra credit for anyone who doesn't crash today.", "SpongeBob! Not again!", "This is a driving school, not a demolition derby!"],
+        happy: ["A clean driving record? I'm shocked!", "No SpongeBob? It’s a good day.", "Who knew peace was possible!", "Everyone passed the test!", "I'm proud of this class!"],
+        sad: ["Just once... I’d like a normal class.", "Why do I keep doing this to myself?", "Maybe I should retire...", "The boat's totaled... again.", "My nerves can't take it."],
+        goofy: ["Let’s pretend reverse is forward today.", "Homework: parallel park... a boat.", "Puff puff pass... the wheel!", "I’m a balloon teacher!", "Don’t pop under pressure!"]
       }
     };
 
     function startChat(character) {
       currentChar = character;
-      chat.style.display = "block";
-      log.innerHTML = `<div class='bubble'>Hey, I'm ${character}! Do you want to chat?</div>`;
+      chat.style.display = 'block';
+      log.innerHTML = `<div class='bubble'>${phrases[character].default[0].includes("'")?`Hey, I'm ${character}!`:`Hey, I'm ${character}!`} Do you want to chat?</div>`;
     }
 
     function sendMessage() {
-      const input = document.getElementById("userInput");
+      const input = document.getElementById('userInput');
       const message = input.value.trim();
       if (!message) return;
       log.innerHTML += `<div class='bubble user'>${message}</div>`;
+      input.value = '';
 
       setTimeout(() => {
-        const tone = mood.value || "default";
-        const responses = phrases[currentChar]?.[tone] || ["Hmm..."];
-        const reply = responses[Math.floor(Math.random() * responses.length)];
-        const span = document.createElement("div");
-        span.className = "bubble";
-        span.textContent = "";
+        const tone = mood.value || 'default';
+        const list = phrases[currentChar][tone];
+        const reply = list[Math.floor(Math.random()*list.length)];
+        const span = document.createElement('div');
+        span.className = 'bubble';
+        span.textContent = '';
         log.appendChild(span);
-
-        let i = 0;
-        const typer = setInterval(() => {
-          span.textContent += reply[i];
-          i++;
-          if (i >= reply.length) clearInterval(typer);
-        }, 30);
-      }, 300);
-
-      input.value = "";
-      input.focus();
+        let i=0;
+        const typer = setInterval(()=>{
+          span.textContent += reply[i++];
+          if(i>=reply.length) clearInterval(typer);
+        },30);
+      },300);
     }
 
-    function clearChat() {
-      log.innerHTML = "";
-    }
-
+    function clearChat() { log.innerHTML = ''; }
     function showTrivia() {
-      const triviaFacts = [
+      const facts=[
         "The Krabby Patty secret formula has never been revealed!",
         "SpongeBob lives in a pineapple because it smells good!",
         "Patrick's full name is Patrick Star.",
         "Squidward only has six tentacles, not eight.",
         "SpongeBob was originally going to be called SpongeBoy."
       ];
-      const fact = triviaFacts[Math.floor(Math.random() * triviaFacts.length)];
-      log.innerHTML += `<div class='bubble'>🧠 Trivia: ${fact}</div>`;
+      log.innerHTML += `<div class='bubble'>🧠 Trivia: ${facts[Math.floor(Math.random()*facts.length)]}</div>`;
     }
   </script>
 </body>
