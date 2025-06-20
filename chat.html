@@ -90,6 +90,18 @@
   </select>
 
   <div class="characters" id="characterList"></div>
+    <div class="characters">
+    <button class="character-btn" onclick="startChat('SpongeBob')">🧽 SpongeBob</button>
+    <button class="character-btn" onclick="startChat('Patrick')">🌟 Patrick</button>
+    <button class="character-btn" onclick="startChat('Squidward')">🎷 Squidward</button>
+    <button class="character-btn" onclick="startChat('MrKrabs')">💰 Mr. Krabs</button>
+    <button class="character-btn" onclick="startChat('Sandy')">🐿️ Sandy</button>
+    <button class="character-btn" onclick="startChat('Plankton')">🦠 Plankton</button>
+    <button class="character-btn" onclick="startChat('Gary')">🐌 Gary</button>
+    <button class="character-btn" onclick="startChat('Pearl')">🐳 Pearl</button>
+    <button class="character-btn" onclick="startChat('Larry')">🦞 Larry</button>
+    <button class="character-btn" onclick="startChat('MrsPuff')">🎈 Mrs. Puff</button>
+  </div>
 
   <div id="chat" class="chat-box" style="display:none;">
     <div id="chatLog"></div>
@@ -106,8 +118,18 @@
     const mood = document.getElementById("mood");
     let currentChar = "";
 
-    const characters = ["SpongeBob", "Patrick", "Squidward", "Mr. Krabs", "Sandy", "Plankton", "Gary", "Pearl", "Larry the Lobster", "Mrs. Puff"];
-
+      const emojiIcons = {
+      SpongeBob: "🧽",
+      Patrick: "🌟",
+      Squidward: "🎷",
+      MrKrabs: "💰",
+      Sandy: "🐿️",
+      Plankton: "🦠",
+      Gary: "🐌",
+      Pearl: "🐳",
+      Larry: "🦞",
+      MrsPuff: "🎈"
+    };
     characters.forEach(char => {
       const btn = document.createElement("button");
       btn.className = "character-btn";
